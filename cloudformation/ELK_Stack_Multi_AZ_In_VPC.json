@@ -99,7 +99,7 @@
         "ElkAutoscalingGroup": {
             "Type": "AWS::AutoScaling::AutoScalingGroup",
             "Properties": {
-                "AvailabilityZones": { "Fn::GetAZs": "" },
+                "AvailabilityZones": { "Fn::GetAZs": ["us-east-1d"] },
                 "VPCZoneIdentifier": { "Ref": "VpcSubnets" },
                 "LaunchConfigurationName": { "Ref": "ElkLaunchConfig" },
                 "MinSize": "1",
