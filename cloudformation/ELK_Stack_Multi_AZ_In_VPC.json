@@ -136,7 +136,7 @@
         "ElkLaunchConfig": {
             "Type": "AWS::AutoScaling::LaunchConfiguration",
             "Properties": {
-                "ImageId": "ami-cb4986bc",
+                "ImageId": "ami-3ae64552",
                 "SecurityGroups": [ { "Ref": "ElkSecurityGroup" }, { "Ref": "ElkLoadBalancerSecurityGroup" } ],
                 "InstanceType": { "Ref": "ElkInstanceType" },
                 "IamInstanceProfile": { "Ref": "InstanceProfile" },
