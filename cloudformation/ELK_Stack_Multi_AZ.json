@@ -6,7 +6,7 @@
     "Parameters": {
 
         "KeyName": {
-            "Default": "bootstrap",
+            "Default": "aws-elastic",
             "Description": "Name of an existing EC2 KeyPair for SSH access",
             "Type": "String"
         },
@@ -127,7 +127,7 @@
         "ElkLaunchConfig": {
             "Type": "AWS::AutoScaling::LaunchConfiguration",
             "Properties": {
-                "ImageId": "ami-cb4986bc",
+                "ImageId": "ami-88562de0",
                 "SecurityGroups": [ { "Ref": "ElkSecurityGroup" } ],
                 "InstanceType": { "Ref": "ElkInstanceType" },
                 "IamInstanceProfile": { "Ref": "InstanceProfile" },
@@ -139,13 +139,13 @@
 
                             "wget -O - http://packages.elasticsearch.org/GPG-KEY-elasticsearch | apt-key add -",
                             "echo \"deb http://packages.elasticsearch.org/logstash/1.4/debian stable main\" > /etc/apt/sources.list.d/logstash.list",
-                            "echo \"deb http://packages.elasticsearch.org/elasticsearch/1.3/debian stable main\" > /etc/apt/sources.list.d/elasticsearch.list",
+                            "echo \"deb http://packages.elasticsearch.org/elasticsearch/1.4.2/debian stable main\" > /etc/apt/sources.list.d/elasticsearch.list",
 
                             "add-apt-repository -y ppa:chris-lea/node.js",
                             "apt-get -y update",
                             "apt-get -y install language-pack-en build-essential openjdk-7-jre-headless logstash elasticsearch nodejs",
 
-                            "wget -O /etc/logstash/conf.d/logstash-indexer.conf https://raw.githubusercontent.com/guardian/elk-stack/master/config/logstash-indexer.conf",
+                            "wget -O /etc/logstash/conf.d/logstash-indexer.conf https://raw.githubusercontent.com/colinreidbrown/elk-stack/master/config/logstash-indexer.conf",
                             "sed -i -e 's,@@ELASTICSEARCH,localhost,g' /etc/logstash/conf.d/logstash-indexer.conf",
 
                             "/usr/share/elasticsearch/bin/plugin --install elasticsearch/elasticsearch-cloud-aws/2.1.1",
@@ -153,15 +153,17 @@
                             "/usr/share/elasticsearch/bin/plugin --install lukas-vlcek/bigdesk",
                             "/usr/share/elasticsearch/bin/plugin --install karmi/elasticsearch-paramedic",
                             "/usr/share/elasticsearch/bin/plugin --install royrusso/elasticsearch-HQ",
+                            "/usr/share/elasticsearch/bin/plugin --install lmenezes/elasticsearch-kopf",
 
-                            "wget -O /etc/elasticsearch/elasticsearch.yml https://raw.githubusercontent.com/guardian/elk-stack/master/config/elasticsearch.yml",
+
+                            "wget -O /etc/elasticsearch/elasticsearch.yml https://raw.githubusercontent.com/colinreidbrown/elk-stack/master/config/elasticsearch.yml",
                             { "Fn::Join": [ "", [ "sed -i",
                                 " -e 's,@@REGION,", { "Ref": "AWS::Region" }, ",g'",
                                 " -e 's,@@STACK,", { "Ref": "AWS::StackName" }, ",g'",
                                 " -e 's,@@APP,logger,g'",
                                 " /etc/elasticsearch/elasticsearch.yml" ] ] },
 
-                            "wget -O /etc/init/elasticsearch.conf https://raw.githubusercontent.com/guardian/elk-stack/master/config/upstart-elasticsearch.conf",
+                            "wget -O /etc/init/elasticsearch.conf https://raw.githubusercontent.com/colinreidbrown/elk-stack/master/config/upstart-elasticsearch.conf",
 
                             "umount /mnt",
                             "mkdir /data",
@@ -171,20 +173,20 @@
                             "sysctl vm.overcommit_memory=1",
 
                             "cd /opt",
-                            "wget -O elk-stack.tar.gz https://github.com/guardian/elk-stack/archive/master.tar.gz",
+                            "wget -O elk-stack.tar.gz https://github.com/colinreidbrown/elk-stack/archive/master.tar.gz",
                             "tar zxvf elk-stack.tar.gz",
                             "mv elk-stack-master/src logcabin",
                             "adduser --disabled-password --gecos \"\" logcabin",
                             "cd logcabin && npm install && cd ..",
                             "chown -R logcabin logcabin",
 
-                            "wget -O /opt/logcabin/config.js https://raw.githubusercontent.com/guardian/elk-stack/master/config/config.js",
+                            "wget -O /opt/logcabin/config.js https://raw.githubusercontent.com/colinreidbrown/elk-stack/master/config/config.js",
                             { "Fn::Join": [ "", [ "sed -i",
                                 " -e 's,@@LOGCABIN_HOST,", { "Fn::GetAtt": [ "ElkLoadBalancer", "DNSName" ]}, ",g'",
                                 " -e 's,@@CLIENT_ID,", { "Ref": "GoogleOAuthClientId" }, ",g'",
                                 " -e 's,@@CLIENT_SECRET,", { "Ref": "GoogleOAuthClientSecret" }, ",g'",
                                 " /opt/logcabin/config.js" ] ] },
-                            "wget -O /etc/init/logcabin.conf https://raw.githubusercontent.com/guardian/elk-stack/master/config/upstart-logcabin.conf",
+                            "wget -O /etc/init/logcabin.conf https://raw.githubusercontent.com/colinreidbrown/elk-stack/master/config/upstart-logcabin.conf",
 
                             "wget http://download.elasticsearch.org/kibana/kibana/kibana-latest.tar.gz",
                             "tar zxvf kibana-latest.tar.gz",
@@ -222,7 +224,7 @@
                         "IpProtocol": "tcp",
                         "FromPort": "22",
                         "ToPort": "22",
-                        "CidrIp": "77.91.248.0/21"
+                        "CidrIp": "172.30.0.158/0"
                     }
                 ]
             }
@@ -247,7 +249,7 @@
                     {
                         "PolicyName":"ec2-describe-instances",
                         "PolicyDocument": {
-                            "Version" : "2012-10-17",
+                            "Version" : "2014-1-23",
                             "Statement": [
                                 {
                                     "Action": "ec2:DescribeInstances",

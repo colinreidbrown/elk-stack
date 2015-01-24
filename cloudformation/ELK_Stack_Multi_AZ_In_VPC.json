@@ -99,7 +99,7 @@
         "ElkAutoscalingGroup": {
             "Type": "AWS::AutoScaling::AutoScalingGroup",
             "Properties": {
-                "AvailabilityZones": { "Fn::GetAZs": ["us-east-1d"] },
+                "AvailabilityZones": { "Fn::GetAZs": "us-east-1d" },
                 "VPCZoneIdentifier": { "Ref": "VpcSubnets" },
                 "LaunchConfigurationName": { "Ref": "ElkLaunchConfig" },
                 "MinSize": "1",
@@ -136,7 +136,7 @@
         "ElkLaunchConfig": {
             "Type": "AWS::AutoScaling::LaunchConfiguration",
             "Properties": {
-                "ImageId": "ami-3ae64552",
+                "ImageId": "ami-88562de0",
                 "SecurityGroups": [ { "Ref": "ElkSecurityGroup" }, { "Ref": "ElkLoadBalancerSecurityGroup" } ],
                 "InstanceType": { "Ref": "ElkInstanceType" },
                 "IamInstanceProfile": { "Ref": "InstanceProfile" },
